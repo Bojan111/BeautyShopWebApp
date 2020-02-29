@@ -1,0 +1,75 @@
+﻿@page
+@model BeautyShopWebApp.VisitListModel
+@{
+    ViewData["Title"] = "VisitList";
+}
+
+<h1>Visit Management</h1>
+<div>
+    <form method="get">
+        <div class="form-group">
+            <div class="input-group">
+                <input type="search" class="form-control" placeholder="search" asp-for="SearchTerm">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Custumer</th>
+                <th>Total Expences</th>
+            </tr>
+        </thead>
+        @foreach (var visit in Model.Visits)
+        {
+            <tr>
+                <td>
+                    @visit.Customer.FirstName @visit.Customer.LastName
+                </td>
+                <td>
+                    @Model.GetTotalExpenses(visit)
+                </td>
+            </tr>
+        }
+        <tfoot style="visibility:@(!Model.Visits.Any() ? "visible" : "hidden")">
+            <tr>
+                <td colspan="2">
+                    Nothing to display.
+                </td>
+            </tr>
+        </tfoot>
+        <tfoot style="visibility:@(Model.Visits.Any() ? "visible" : "hidden")">
+            <tr>
+                <th colspan="2">
+                    Total By Customer:
+                </th>
+            </tr>
+            @foreach (var item in Model.Visits.GroupBy(x => x.Customer.Id))
+            {
+                <tr>
+                    <td>
+                        @item.First().Customer.FirstName @item.First().Customer.LastName
+                    </td>
+                    <td>
+                        @item.Sum(x => Model.GetTotalExpenses(x))
+                    </td>
+                </tr>
+            }
+        </tfoot>
+    </table>
+</div>
+<div class="form-group">
+    <a class="btn btn-primary" asp-page="./Edit">Add Visit</a>
+</div>
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-info">@Model.Message</div>
+}
+
